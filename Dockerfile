@@ -2,7 +2,6 @@ FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS base
 
 ####################################################################################
 ### Install OpenSSH and set the password for root to "Docker!"
-### This will make it possible to debug the container in the App Service SCM tooling
 ####################################################################################
 RUN apt-get update \
      && apt-get install -y openssh-server htop dos2unix \
