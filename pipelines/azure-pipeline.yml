@@ -1,0 +1,139 @@
+name: $(Date:yyyyMMdd)$(Rev:.r)
+
+trigger:
+  branches:
+    include:
+    - master
+
+# Mens vi venter på en Linux bygg agent som kan bygge containere. Kan ikke være Windows.
+# pool: Default
+
+# Load secrets from Key Vault
+variables:
+  - group: aks-startup-appservices
+  - group: aks-startup-dotnet-app-dev
+  - name: workingDirectoryFolder
+    value: $(System.DefaultWorkingDirectory)
+
+stages:
+- stage: Continuous_Integration
+  displayName: Continuous Integration
+  pool:
+     vmImage: ubuntu-latest
+  jobs:
+  - job: BuildPush
+    displayName: Build and push
+    steps:
+    - bash: |
+        ls -al
+      displayName: List files in $(workingDirectoryFolder)
+      workingDirectory: $(workingDirectoryFolder)
+      failOnStderr: true
+
+    - task: Docker@2
+      displayName: Login to ACR
+      inputs:
+        command: login
+        containerRegistry: aks-startupdacr01
+
+    - task: Docker@2
+      displayName: Build and push
+      inputs:
+        command: buildAndPush
+        containerRegistry: aks-startupdacr01
+        repository: 'aks-startup-dotnet-app'
+        Dockerfile: 'Dockerfile'
+        tags: 'latest'
+
+- stage: Migrate_Database_DEV
+  dependsOn: Continuous_Integration
+  condition: succeeded()   
+  displayName: Migrate database in DEV
+  pool: Self Hosted aks-startup
+    #  vmImage: ubuntu-latest
+  jobs:
+    - job: Deploy
+      steps:
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core sdk'
+        inputs:
+          packageType: sdk
+          version: 5.x
+          installationPath: $(Agent.ToolsDirectory)/dotnet        
+      # - task: DotNetCoreCLI@2
+      #   displayName: Install EF Tool
+      #   inputs:
+      #     command: custom
+      #     custom: 'tool '
+      #     arguments: 'install --global dotnet-ef'
+      - script: |
+          dotnet tool restore
+          dotnet ef --version
+          echo "Server=$(URL_MSSQL_SQL);Database=$(aks-startup-dotnet-app_DATABASE_NAME);User Id=$(DB_MIGRATE_USER_ID);Password=$(DB_MIGRATE_USER_PASSWORD);"
+          dotnet ef database update --verbose --connection "Server=$(URL_MSSQL_SQL);Database=$(aks-startup-dotnet-app_DATABASE_NAME);User Id=$(DB_MIGRATE_USER_ID);Password=$(DB_MIGRATE_USER_PASSWORD);"
+        displayName: dotnet ef database update
+        workingDirectory: $(workingDirectoryFolder)/src/AksStartupDotnetApp
+        env:
+          aVarFromYaml: someValue
+        
+  
+      # - bash: |
+      #     dotnet tool restore
+      #   displayName: dotnet tool restore
+      #   workingDirectory: $(workingDirectoryFolder)/src/AksStartupDotnetApp
+      #   failOnStderr: true
+      # - bash: |
+      #     dotnet ef --version
+      #     dotnet ef database update --verbose --connection "Server=$(URL_MSSQL_SQL);Database=$(aks-startup-dotnet-app_DATABASE_NAME);User Id=$(DB_MIGRATE_USER_ID);Password=$(DB_MIGRATE_USER_PASSWORD);"
+      #   displayName: dotnet ef database update
+      #   workingDirectory: $(workingDirectoryFolder)/src/AksStartupDotnetApp
+      #   failOnStderr: true
+  
+
+- stage: Deploy_to_DEV
+  dependsOn: Migrate_Database_DEV
+  condition: succeeded()   
+  displayName: Deploy to DEV
+  pool:
+     vmImage: ubuntu-latest
+  jobs:
+    - job: Deploy
+      steps:
+      - task: AzureCLI@2
+        displayName: Restart App Service
+        inputs:
+          azureSubscription: aks-startup-d-sp-aks-startup-dotnet-app
+          scriptType: bash
+          scriptLocation: inlineScript
+          inlineScript: |
+            az --version
+            az account show        
+            az webapp restart --name aks-startup-d-app-aks-startup-dotnet-app --resource-group aks-startup-d-rg-aks-startup-dotnet-app
+
+
+
+# - stage: install_tooling_on_agent
+#   displayName: Install SDKs and tooling on Self Hosted aks-startup
+#   pool: Self Hosted aks-startup
+#     #  vmImage: ubuntu-latest
+#   jobs:
+#     - job: install_tooling_on_agent
+#       steps:
+#       - task: UseDotNet@2
+#         displayName: 'Use .NET Core sdk'
+#         inputs:
+#           packageType: sdk
+#           version: 5.x
+#           installationPath: $(Agent.ToolsDirectory)/dotnet        
+#       - task: DotNetCoreCLI@2
+#         displayName: Install EF Tool
+#         inputs:
+#           command: custom
+#           custom: 'tool '
+#           arguments: 'install --global dotnet-ef'
+#       - script: |
+#           dotnet tool restore
+#           dotnet ef --version
+#         displayName: dotnet tool restore
+#         workingDirectory: $(workingDirectoryFolder)/src/AksStartupDotnetApp
+      

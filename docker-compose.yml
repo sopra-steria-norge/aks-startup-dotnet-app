@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  aks-startup-dotnet-app:
+    image: aks-startupdacr01.azurecr.io/aks-startup-dotnet-app:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    container_name: aks-startup-dotnet-app-1
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - Logging__LogLevel__Microsoft=Debug
+      - Logging__LogLevel__Default=Debug
+      - SQL_CONNECTION_STRING=Server=mssql;Database=aks-startup-dotnet-app;User Id=sa;Password=Secret1234
+    ports: 
+      - 5000:5000
+      - 2222:2222
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - aks_startup_common_network
+networks:
+  aks_startup_common_network:
+    name: aks_startup_common_network
+    external: true
+volumes:
+  kestrel_certificate: {}    
