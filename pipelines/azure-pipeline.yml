@@ -1,11 +1,41 @@
-# name: $(Date:yyyyMMdd)$(Rev:.r)
+name: $(Date:yyyyMMdd)$(Rev:.r)
 
-# trigger:
-#   branches:
-#     include:
-#     - master
+trigger:
+  branches:
+    include:
+    - master
 
-# variables:
-#   - name: workingDirectoryFolder
-#     value: $(System.DefaultWorkingDirectory)
+variables:
+  - name: workingDirectoryFolder
+    value: $(System.DefaultWorkingDirectory)
 
+stages:
+- stage: Continuous_Integration
+  displayName: Continuous Integration
+  pool:
+     vmImage: ubuntu-latest
+  jobs:
+  - job: BuildPush
+    displayName: Build and push
+    steps:
+
+    - bash: |
+        ls -al
+      displayName: List files in $(workingDirectoryFolder)
+      workingDirectory: $(workingDirectoryFolder)
+      failOnStderr: true
+
+    - task: Docker@2
+      displayName: Login to ACR
+      inputs:
+        command: login
+        containerRegistry: aksstartup-acr
+
+    - task: Docker@2
+      displayName: Build and push
+      inputs:
+        command: buildAndPush
+        containerRegistry: aksstartup-acr
+        repository: 'aks-startup-dotnet-app'
+        Dockerfile: 'Dockerfile'
+        tags: 'latest'
