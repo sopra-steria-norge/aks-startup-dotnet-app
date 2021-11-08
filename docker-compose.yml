@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   aks-startup-dotnet-app:
-    image: aks-startupdacr01.azurecr.io/aks-startup-dotnet-app:latest
+    image: aksstartup.azurecr.io/aks-startup-dotnet-app:latest
     build:
       context: .
       dockerfile: Dockerfile
