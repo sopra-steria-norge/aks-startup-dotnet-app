@@ -82,7 +82,6 @@ namespace AksStartupDotnetApp
             if (!string.IsNullOrEmpty(envValue))
                 return envValue;
             return Configuration.GetConnectionString("sqlConnection");
-
         }
     }
 }
