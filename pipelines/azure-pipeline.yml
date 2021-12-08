@@ -7,10 +7,7 @@ trigger:
 
 variables:
   workingDirectoryFolder: $(System.DefaultWorkingDirectory)
-  azureSubscriptionEndpoint: Contoso
-  azureContainerRegistry: contoso.azurecr.io
-  azureResourceGroup: Contoso
-  kubernetesCluster: Contoso    
+  kubernetesServiceEndpoint: aksstartup-aks
 
 stages:
 - stage: Continuous_Integration
@@ -50,9 +47,7 @@ stages:
     - task: HelmDeploy@0
       displayName: Helm list
       inputs:
-        connectionType: Azure Resource Manager
-        azureSubscriptionEndpoint: $(azureSubscriptionEndpoint)
-        azureResourceGroup: $(azureResourceGroup)
-        kubernetesCluster: $(kubernetesCluster)
+        connectionType: Kubernetes Service Connection
+        kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
         command: ls
         arguments: --all
