@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: aks-startup-app
-  version: a-new-version-1234
 spec:
   replicas: 1
   selector:
