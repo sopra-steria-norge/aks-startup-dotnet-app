@@ -61,11 +61,10 @@ stages:
         arguments: --all
 
     - bash: |
-        cd /helm
         helm template aks-startup-app .
         helm install aks-startup-app .
       displayName: List files in $(workingDirectoryFolder)
-      workingDirectory: $(workingDirectoryFolder)
+      workingDirectory: $(workingDirectoryFolder)/helm
       failOnStderr: true  
 
     # - task: HelmDeploy@0
