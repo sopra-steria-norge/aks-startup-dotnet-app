@@ -50,16 +50,6 @@ kubectl get services aks-startup-app
 helm upgrade aks-startup-app .
 ```
 
-4 - Legg til ny data ved endring for å trigge deployment
-
-```bash
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: aks-startup-app
-  version: a-new-version-1234
-```
-
 -----------------
 
 Basert på 
