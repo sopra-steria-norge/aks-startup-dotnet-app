@@ -20,6 +20,12 @@ namespace AksStartupDotnetApp.Controllers
             return "OK";
         }
 
+        [HttpGet("/")]
+        public string HealthRoot()
+        {
+            return "OK";
+        }
+
         /// <summary>
         /// Health endpoint to check if the service is able to connect to the database and read values.
         /// </summary>
