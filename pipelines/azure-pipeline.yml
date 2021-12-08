@@ -51,7 +51,7 @@ stages:
       displayName: List files in $(workingDirectoryFolder)
       workingDirectory: $(workingDirectoryFolder)
       failOnStderr: true
-            
+
     - task: HelmDeploy@0
       displayName: Helm list
       inputs:
@@ -67,4 +67,4 @@ stages:
         kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
         command: install
         chartType: FilePath
-        chartPath: $(workingDirectoryFolder)/helm/aks-startup-dotnet-app
+        chartPath: $(workingDirectoryFolder)/helm
