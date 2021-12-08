@@ -6,8 +6,11 @@ trigger:
     - master
 
 variables:
-  - name: workingDirectoryFolder
-    value: $(System.DefaultWorkingDirectory)
+  workingDirectoryFolder: $(System.DefaultWorkingDirectory)
+  azureSubscriptionEndpoint: Contoso
+  azureContainerRegistry: contoso.azurecr.io
+  azureResourceGroup: Contoso
+  kubernetesCluster: Contoso    
 
 stages:
 - stage: Continuous_Integration
@@ -32,10 +35,24 @@ stages:
         containerRegistry: aksstartup-acr
 
     - task: Docker@2
-      displayName: Build and push
+      displayName: Deploy to AKS
       inputs:
         command: buildAndPush
         containerRegistry: aksstartup-acr
         repository: 'aks-startup-dotnet-app'
         Dockerfile: 'Dockerfile'
         tags: 'latest'
+
+  - job: DeploytoAKS
+    displayName: Deploy to AKS
+    steps:
+
+    - task: HelmDeploy@0
+      displayName: Helm list
+      inputs:
+        connectionType: Azure Resource Manager
+        azureSubscriptionEndpoint: $(azureSubscriptionEndpoint)
+        azureResourceGroup: $(azureResourceGroup)
+        kubernetesCluster: $(kubernetesCluster)
+        command: ls
+        arguments: --all
