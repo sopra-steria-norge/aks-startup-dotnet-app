@@ -60,11 +60,19 @@ stages:
         command: ls
         arguments: --all
 
-    - task: HelmDeploy@0
-      displayName: Helm deploy
-      inputs:
-        connectionType: Kubernetes Service Connection
-        kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
-        command: install
-        chartType: FilePath
-        chartPath: $(workingDirectoryFolder)/helm
+    - bash: |
+        cd /helm
+        helm template aks-startup-app .
+        helm install aks-startup-app .
+      displayName: List files in $(workingDirectoryFolder)
+      workingDirectory: $(workingDirectoryFolder)
+      failOnStderr: true  
+
+    # - task: HelmDeploy@0
+    #   displayName: Helm deploy
+    #   inputs:
+    #     connectionType: Kubernetes Service Connection
+    #     kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
+    #     command: install
+    #     chartType: FilePath
+    #     chartPath: $(workingDirectoryFolder)/helm
