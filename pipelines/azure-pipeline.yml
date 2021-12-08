@@ -69,7 +69,7 @@ stages:
 
     - bash: |
         helm template aks-startup-app .
-        helm install aks-startup-app .
+        helm upgrade --install aks-startup-app .
       displayName: List files in $(workingDirectoryFolder)
       workingDirectory: $(workingDirectoryFolder)/helm
       failOnStderr: true  
