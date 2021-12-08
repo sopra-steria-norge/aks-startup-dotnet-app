@@ -73,3 +73,9 @@ stages:
       displayName: helm upgrade --install
       workingDirectory: $(workingDirectoryFolder)/helm
       failOnStderr: false  
+
+    - bash: |
+        kubectl rollout restart deploy aks-startup-app
+      displayName: Force pull latest container image
+      workingDirectory: $(workingDirectoryFolder)/helm
+      failOnStderr: false  
