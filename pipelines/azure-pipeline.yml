@@ -39,7 +39,7 @@ stages:
         containerRegistry: aksstartup-acr
         repository: 'aks-startup-dotnet-app'
         Dockerfile: 'Dockerfile'
-        tags: '1234'
+        tags: 'latest'
 
   - job: DeploytoAKS
     dependsOn: build_push

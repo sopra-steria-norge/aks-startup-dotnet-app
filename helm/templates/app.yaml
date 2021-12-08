@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: aks-startup-app
+  version: a-new-version-1234
 spec:
   replicas: 1
   selector:
@@ -13,7 +14,7 @@ spec:
         app: aks-startup-app
     spec:
       containers:
-      - image: aksstartup.azurecr.io/aks-startup-dotnet-app:1234
+      - image: aksstartup.azurecr.io/aks-startup-dotnet-app:latest
         imagePullPolicy: Always
         name: aks-startup-app
         ports:
