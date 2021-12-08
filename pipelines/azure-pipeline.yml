@@ -72,7 +72,7 @@ stages:
         helm upgrade --install aks-startup-app .
       displayName: List files in $(workingDirectoryFolder)
       workingDirectory: $(workingDirectoryFolder)/helm
-      failOnStderr: true  
+      failOnStderr: false  
 
     # - task: HelmDeploy@0
     #   displayName: Helm deploy
