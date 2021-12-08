@@ -46,6 +46,12 @@ stages:
     displayName: Deploy to AKS
     steps:
 
+    - bash: |
+        ls -al
+      displayName: List files in $(workingDirectoryFolder)
+      workingDirectory: $(workingDirectoryFolder)
+      failOnStderr: true
+            
     - task: HelmDeploy@0
       displayName: Helm list
       inputs:
