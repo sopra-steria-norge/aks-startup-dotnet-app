@@ -33,7 +33,7 @@ stages:
         containerRegistry: aksstartup-acr
 
     - task: Docker@2
-      displayName: Deploy to AKS
+      displayName: Build and build
       inputs:
         command: buildAndPush
         containerRegistry: aksstartup-acr
