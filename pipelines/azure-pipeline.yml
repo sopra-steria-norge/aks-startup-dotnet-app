@@ -60,6 +60,13 @@ stages:
         command: ls
         arguments: --all
 
+    - task: Kubernetes@1
+      displayName: kubectl login
+      inputs:
+        connectionType: Kubernetes Service Connection
+        kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
+        command: login
+
     - bash: |
         helm template aks-startup-app .
         helm install aks-startup-app .
